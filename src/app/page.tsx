@@ -81,7 +81,9 @@ export default function Home() {
   const { connect } = useConnect();
   // writeContractAsync returns a promise that resolves to a tx hash (string)
   const { writeContractAsync, data: txHash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash as string | undefined });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ 
+    hash: txHash ? txHash as `0x${string}` : undefined 
+  });
 
   const [isClient, setIsClient] = useState(false);
   const [revenueAmount, setRevenueAmount] = useState(''); // human-readable USDC (e.g., "25.5")

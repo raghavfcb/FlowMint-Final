@@ -55,12 +55,12 @@ const Login = () => {
     }
   };
 
-  const selectRole = (selectedRole) => {
+  const selectRole = (selectedRole: string) => {
     setRole(selectedRole);
     setStep(3);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
