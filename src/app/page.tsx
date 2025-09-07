@@ -1,4 +1,13 @@
 'use client';
+interface AbiItem {
+  constant?: boolean;
+  inputs?: { name: string; type: string }[];
+  name?: string;
+  outputs?: { name: string; type: string }[];
+  payable?: boolean;
+  stateMutability?: string;
+  type: string;
+}
 
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -66,7 +75,7 @@ export default function Home() {
   useEffect(() => setIsClient(true), []);
 
   // --- ABI presence sanity check (prevents "Function not found" confusion) ---
-  const distributorAbi = distributorArtifact.abi as any[];
+  const distributorAbi = distributorArtifact.abi as AbiItem[];
   const hasDepositRevenue = useMemo(
     () => distributorAbi.some((f) => f.type === 'function' && f.name === 'depositRevenue'),
     [distributorAbi]
