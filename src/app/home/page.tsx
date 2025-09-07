@@ -70,9 +70,10 @@ const Home = () => {
       });
     } catch (error) {
       console.error('Mint error:', error);
-      if (error.message?.includes('User rejected')) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('User rejected')) {
         alert('Transaction was cancelled by user.');
-      } else if (error.message?.includes('insufficient funds')) {
+      } else if (errorMessage.includes('insufficient funds')) {
         alert('Insufficient funds for gas. Please add MATIC to your wallet.');
       } else {
         alert('Minting failed. Please check your wallet connection and try again.');
