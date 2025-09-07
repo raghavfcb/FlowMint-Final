@@ -12,7 +12,7 @@ import distributorArtifact from '@/lib/abi/RevenueDistributor.json';
 const Home = () => {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showMintSection, setShowMintSection] = useState(false);
   const api = useApi();
