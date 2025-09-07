@@ -149,24 +149,28 @@ export default function Home() {
 
       setTransactionHash(String(hash));
       setTransactionStatus('confirming');
-    } catch (caughtError: unknown) {
-      console.error('Mint error:', caughtError);
+    } catch (error: unknown) {
+  console.error("Mint error:", error);
 
-      if (caughtError instanceof Error) {
-        const msg = caughtError.message || '';
-        if (msg.includes('User rejected')) {
-          alert('Transaction was cancelled by user.');
-        } else if (msg.includes('insufficient funds')) {
-          alert('Insufficient funds for gas. Please add MATIC to your wallet.');
-        } else {
-          alert('Minting failed. Please check your wallet connection and try again.');
-        }
-      } else {
-        alert('Minting failed. Unknown error.');
-      }
+  // Handle ethers.js / MetaMask errors (they often have a 'code' property)
+  const err = error as { code?: number; message?: string; reason?: string };
 
-      setTransactionStatus('error');
-    }
+  if (err?.code === 4001 || err?.message?.includes("User rejected")) {
+    // 4001 = User rejected transaction in MetaMask
+    alert("Transaction was cancelled by user.");
+  } else if (err?.message?.toLowerCase().includes("insufficient funds")) {
+    alert("Insufficient funds for gas. Please add MATIC to your wallet.");
+  } else if (err?.reason?.toLowerCase().includes("execution reverted")) {
+    alert("Transaction failed due to smart contract conditions.");
+  } else if (error instanceof Error) {
+    // Generic JS Error fallback
+    alert("An unexpected error occurred: " + error.message);
+  } else {
+    // Unknown non-Error case
+    alert("An unknown error occurred.");
+  }
+}
+
   };
 
   // Approve USDC for the distributor to pull
@@ -190,22 +194,28 @@ export default function Home() {
 
       setTransactionHash(String(hash));
       setTransactionStatus('confirming');
-    } catch (caughtError: unknown) {
-      console.error('Approve error:', caughtError);
-      setTransactionStatus('error');
-      if (caughtError instanceof Error) {
-        const msg = caughtError.message || '';
-        if (msg.includes('User rejected')) {
-          alert('Transaction was cancelled by user.');
-        } else if (msg.includes('insufficient funds')) {
-          alert('Insufficient funds for gas. Please add MATIC to your wallet.');
-        } else {
-          alert('USDC approval failed. Please try again.');
-        }
-      } else {
-        alert('USDC approval failed. Unknown error.');
-      }
-    }
+    } catch (error: unknown) {
+  console.error("Mint error:", error);
+
+  // Handle ethers.js / MetaMask errors (they often have a 'code' property)
+  const err = error as { code?: number; message?: string; reason?: string };
+
+  if (err?.code === 4001 || err?.message?.includes("User rejected")) {
+    // 4001 = User rejected transaction in MetaMask
+    alert("Transaction was cancelled by user.");
+  } else if (err?.message?.toLowerCase().includes("insufficient funds")) {
+    alert("Insufficient funds for gas. Please add MATIC to your wallet.");
+  } else if (err?.reason?.toLowerCase().includes("execution reverted")) {
+    alert("Transaction failed due to smart contract conditions.");
+  } else if (error instanceof Error) {
+    // Generic JS Error fallback
+    alert("An unexpected error occurred: " + error.message);
+  } else {
+    // Unknown non-Error case
+    alert("An unknown error occurred.");
+  }
+}
+
   };
 
   // Deposit revenue (USDC) — requires ABI to have depositRevenue(uint256)
@@ -248,24 +258,28 @@ export default function Home() {
 
       setTransactionHash(String(hash));
       setTransactionStatus('confirming');
-    } catch (caughtError: unknown) {
-      console.error('Deposit error:', caughtError);
-      setTransactionStatus('error');
-      if (caughtError instanceof Error) {
-        const msg = caughtError.message || '';
-        if (msg.includes('User rejected')) {
-          alert('Transaction was cancelled by user.');
-        } else if (msg.includes('insufficient funds')) {
-          alert('Insufficient funds for gas. Please add MATIC to your wallet.');
-        } else if (msg.includes('allowance')) {
-          alert('Please approve USDC first before depositing revenue.');
-        } else {
-          alert('Transaction failed. Please check your USDC balance and approval.');
-        }
-      } else {
-        alert('Transaction failed. Unknown error.');
-      }
-    }
+    } catch (error: unknown) {
+  console.error("Mint error:", error);
+
+  // Handle ethers.js / MetaMask errors (they often have a 'code' property)
+  const err = error as { code?: number; message?: string; reason?: string };
+
+  if (err?.code === 4001 || err?.message?.includes("User rejected")) {
+    // 4001 = User rejected transaction in MetaMask
+    alert("Transaction was cancelled by user.");
+  } else if (err?.message?.toLowerCase().includes("insufficient funds")) {
+    alert("Insufficient funds for gas. Please add MATIC to your wallet.");
+  } else if (err?.reason?.toLowerCase().includes("execution reverted")) {
+    alert("Transaction failed due to smart contract conditions.");
+  } else if (error instanceof Error) {
+    // Generic JS Error fallback
+    alert("An unexpected error occurred: " + error.message);
+  } else {
+    // Unknown non-Error case
+    alert("An unknown error occurred.");
+  }
+}
+
   };
 
   const handleClaimRevenue = async () => {
@@ -285,22 +299,28 @@ export default function Home() {
 
       setTransactionHash(String(hash));
       setTransactionStatus('confirming');
-    } catch (caughtError: unknown) {
-      console.error('Claim error:', caughtError);
-      setTransactionStatus('error');
-      if (caughtError instanceof Error) {
-        const msg = caughtError.message || '';
-        if (msg.includes('User rejected')) {
-          alert('Transaction was cancelled by user.');
-        } else if (msg.includes('insufficient funds')) {
-          alert('Insufficient funds for gas. Please add MATIC to your wallet.');
-        } else {
-          alert('Claim failed. Please check your token ID and try again.');
-        }
-      } else {
-        alert('Claim failed. Unknown error.');
-      }
-    }
+    } catch (error: unknown) {
+  console.error("Mint error:", error);
+
+  // Handle ethers.js / MetaMask errors (they often have a 'code' property)
+  const err = error as { code?: number; message?: string; reason?: string };
+
+  if (err?.code === 4001 || err?.message?.includes("User rejected")) {
+    // 4001 = User rejected transaction in MetaMask
+    alert("Transaction was cancelled by user.");
+  } else if (err?.message?.toLowerCase().includes("insufficient funds")) {
+    alert("Insufficient funds for gas. Please add MATIC to your wallet.");
+  } else if (err?.reason?.toLowerCase().includes("execution reverted")) {
+    alert("Transaction failed due to smart contract conditions.");
+  } else if (error instanceof Error) {
+    // Generic JS Error fallback
+    alert("An unexpected error occurred: " + error.message);
+  } else {
+    // Unknown non-Error case
+    alert("An unknown error occurred.");
+  }
+}
+
   };
 
   useEffect(() => {
