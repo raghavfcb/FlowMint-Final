@@ -1,5 +1,7 @@
 "use client";
+
 import { useState } from "react";
+import Link from "next/link";
 import { useAccount, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 
@@ -12,20 +14,20 @@ export default function Header() {
     <header className="fixed top-0 left-0 w-full bg-[#0f0f28]/70 backdrop-blur-md border-b border-white/10 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo + Brand */}
-        <a href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
             FlowMint
           </span>
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          <a href="/#home" className="text-gray-300 hover:text-pink-400">Home</a>
-          <a href="/#how" className="text-gray-300 hover:text-pink-400">How It Works</a>
-          <a href="/#features" className="text-gray-300 hover:text-pink-400">Features</a>
-          <a href="/flowchart" className="text-gray-300 hover:text-pink-400">Flowchart</a>
-          <a href="/login?role=creator" className="text-gray-300 hover:text-pink-400">Creator</a>
-          <a href="/login?role=investor" className="text-gray-300 hover:text-pink-400">Investor</a>
+          <Link href="/#home" className="text-gray-300 hover:text-pink-400">Home</Link>
+          <Link href="/#how" className="text-gray-300 hover:text-pink-400">How It Works</Link>
+          <Link href="/#features" className="text-gray-300 hover:text-pink-400">Features</Link>
+          <Link href="/flowchart" className="text-gray-300 hover:text-pink-400">Flowchart</Link>
+          <Link href="/login?role=creator" className="text-gray-300 hover:text-pink-400">Creator</Link>
+          <Link href="/login?role=investor" className="text-gray-300 hover:text-pink-400">Investor</Link>
         </nav>
 
         {/* Wallet / Connect */}
@@ -55,12 +57,12 @@ export default function Header() {
       {/* Mobile Nav */}
       {isOpen && (
         <div className="md:hidden bg-[#1a1a40]/95 px-6 py-4 space-y-4 border-t border-white/10">
-          <a href="/#home" className="block text-gray-300 hover:text-pink-400">Home</a>
-          <a href="/#how" className="block text-gray-300 hover:text-pink-400">How It Works</a>
-          <a href="/#features" className="block text-gray-300 hover:text-pink-400">Features</a>
-          <a href="/flowchart" className="block text-gray-300 hover:text-pink-400">Flowchart</a>
-          <a href="/login?role=creator" className="block text-gray-300 hover:text-pink-400">Creator</a>
-          <a href="/login?role=investor" className="block text-gray-300 hover:text-pink-400">Investor</a>
+          <Link href="/#home" className="block text-gray-300 hover:text-pink-400">Home</Link>
+          <Link href="/#how" className="block text-gray-300 hover:text-pink-400">How It Works</Link>
+          <Link href="/#features" className="block text-gray-300 hover:text-pink-400">Features</Link>
+          <Link href="/flowchart" className="block text-gray-300 hover:text-pink-400">Flowchart</Link>
+          <Link href="/login?role=creator" className="block text-gray-300 hover:text-pink-400">Creator</Link>
+          <Link href="/login?role=investor" className="block text-gray-300 hover:text-pink-400">Investor</Link>
           {!isConnected ? (
             <button
               onClick={() => connect({ connector: injected() })}

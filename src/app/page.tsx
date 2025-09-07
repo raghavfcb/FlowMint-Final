@@ -9,11 +9,11 @@ import {
   useWaitForTransactionReceipt,
 } from 'wagmi';
 import { injected } from 'wagmi/connectors';
-import { parseUnits, formatUnits, getContract } from 'viem';
+import { parseUnits, formatUnits } from 'viem';
+import Image from 'next/image';
 
 // --- ABIs (from your Hardhat artifacts; MUST be fresh) ---
 import distributorArtifact from '@/lib/abi/RevenueDistributor.json';
-import nftArtifact from '@/lib/abi/FlowMintNFT.json';
 
 // --- New Components ---
 import FeaturedProjects from '@/components/FeaturedProjects';
@@ -32,27 +32,41 @@ const erc20Abi = [
 
 // --- CONTRACT ADDRESSES (update these) ---
 const revenueDistributorAddress = '0x3a4E9Fa1D8cE4Ee6b75Ef498903eBc8C1E92e507';
-const flowmintNftAddress = '0x417D69F9E27e2184AC89C6Ef4206242E65A685FD';
+
+// ----- Types -----
+type NFTData = {
+  id?: string | number;
+  name?: string;
+  image?: string;
+  minting?: boolean;
+  [key: string]: unknown;
+};
+
+type TxStatus = 'idle' | 'pending' | 'confirming' | 'success' | 'error';
+
+import Header from "@/components/header";
+
 
 export default function Home() {
   const { address, isConnected, chainId } = useAccount();
   const { connect } = useConnect();
-  const { writeContract, writeContractAsync, data: txHash, isPending, error } = useWriteContract();
+  // removed unused writeContract
+  const { writeContractAsync, data: txHash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
   const [isClient, setIsClient] = useState(false);
   const [revenueAmount, setRevenueAmount] = useState(''); // human-readable USDC (e.g., "25.5")
   const [tokenIdToClaim, setTokenIdToClaim] = useState('');
   const [showTransactionModal, setShowTransactionModal] = useState(false);
-  const [transactionStatus, setTransactionStatus] = useState('');
+  const [transactionStatus, setTransactionStatus] = useState<TxStatus>('idle');
   const [transactionHash, setTransactionHash] = useState('');
-  const [generatedNFT, setGeneratedNFT] = useState(null);
+  const [generatedNFT, setGeneratedNFT] = useState<NFTData | null>(null);
   const [showNFTModal, setShowNFTModal] = useState(false);
 
   useEffect(() => setIsClient(true), []);
 
   // --- ABI presence sanity check (prevents "Function not found" confusion) ---
-  const distributorAbi = distributorArtifact.abi;
+  const distributorAbi = distributorArtifact.abi as any[];
   const hasDepositRevenue = useMemo(
     () => distributorAbi.some((f) => f.type === 'function' && f.name === 'depositRevenue'),
     [distributorAbi]
@@ -106,17 +120,22 @@ export default function Home() {
         // NOTE: no "value" here — mint() doesn't accept native MATIC in your contract
       });
       
-      setTransactionHash(hash);
+      setTransactionHash(String(hash));
       setTransactionStatus('confirming');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Mint error:', error);
       setTransactionStatus('error');
-      if (error?.message?.includes('User rejected')) {
-        alert('Transaction was cancelled by user.');
-      } else if (error?.message?.includes('insufficient funds')) {
-        alert('Insufficient funds for gas. Please add MATIC to your wallet.');
+      if (error instanceof Error) {
+        if (error.message.includes('User rejected')) {
+          alert('Transaction was cancelled by user.');
+        } else if (error.message.includes('insufficient funds')) {
+          alert('Insufficient funds for gas. Please add MATIC to your wallet.');
+        } else {
+          alert('Minting failed. Please check your wallet connection and try again.');
+        }
       } else {
-        alert('Minting failed. Please check your wallet connection and try again.');
+        // unknown non-Error
+        alert('Minting failed. Unknown error.');
       }
     }
   };
@@ -140,17 +159,21 @@ export default function Home() {
         gas: 100000n, // Add gas limit
       });
       
-      setTransactionHash(hash);
+      setTransactionHash(String(hash));
       setTransactionStatus('confirming');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Approve error:', error);
       setTransactionStatus('error');
-      if (error?.message?.includes('User rejected')) {
-        alert('Transaction was cancelled by user.');
-      } else if (error?.message?.includes('insufficient funds')) {
-        alert('Insufficient funds for gas. Please add MATIC to your wallet.');
+      if (error instanceof Error) {
+        if (error.message.includes('User rejected')) {
+          alert('Transaction was cancelled by user.');
+        } else if (error.message.includes('insufficient funds')) {
+          alert('Insufficient funds for gas. Please add MATIC to your wallet.');
+        } else {
+          alert('USDC approval failed. Please try again.');
+        }
       } else {
-        alert('USDC approval failed. Please try again.');
+        alert('USDC approval failed. Unknown error.');
       }
     }
   };
@@ -193,19 +216,23 @@ export default function Home() {
         gas: 300000n, // Add gas limit
       });
       
-      setTransactionHash(hash);
+      setTransactionHash(String(hash));
       setTransactionStatus('confirming');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Deposit error:', error);
       setTransactionStatus('error');
-      if (error?.message?.includes('User rejected')) {
-        alert('Transaction was cancelled by user.');
-      } else if (error?.message?.includes('insufficient funds')) {
-        alert('Insufficient funds for gas. Please add MATIC to your wallet.');
-      } else if (error?.message?.includes('allowance')) {
-        alert('Please approve USDC first before depositing revenue.');
+      if (error instanceof Error) {
+        if (error.message.includes('User rejected')) {
+          alert('Transaction was cancelled by user.');
+        } else if (error.message.includes('insufficient funds')) {
+          alert('Insufficient funds for gas. Please add MATIC to your wallet.');
+        } else if (error.message.includes('allowance')) {
+          alert('Please approve USDC first before depositing revenue.');
+        } else {
+          alert('Transaction failed. Please check your USDC balance and approval.');
+        }
       } else {
-        alert('Transaction failed. Please check your USDC balance and approval.');
+        alert('Transaction failed. Unknown error.');
       }
     }
   };
@@ -225,17 +252,21 @@ export default function Home() {
         gas: 200000n, // Add gas limit
       });
       
-      setTransactionHash(hash);
+      setTransactionHash(String(hash));
       setTransactionStatus('confirming');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Claim error:', error);
       setTransactionStatus('error');
-      if (error?.message?.includes('User rejected')) {
-        alert('Transaction was cancelled by user.');
-      } else if (error?.message?.includes('insufficient funds')) {
-        alert('Insufficient funds for gas. Please add MATIC to your wallet.');
+      if (error instanceof Error) {
+        if (error.message.includes('User rejected')) {
+          alert('Transaction was cancelled by user.');
+        } else if (error.message.includes('insufficient funds')) {
+          alert('Insufficient funds for gas. Please add MATIC to your wallet.');
+        } else {
+          alert('Claim failed. Please check your token ID and try again.');
+        }
       } else {
-        alert('Claim failed. Please check your token ID and try again.');
+        alert('Claim failed. Unknown error.');
       }
     }
   };
@@ -246,15 +277,18 @@ export default function Home() {
       refetchSupply();
       refetchClaimable();
     }
-  }, [isConfirmed, refetchSupply, refetchClaimable]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConfirmed]);
 
   if (!isClient) return null;
 
   // Claimable formatted as USDC
   const claimableUSDC = claimableRaw ? `${formatUnits(claimableRaw, 6)} USDC` : null;
-
-  return (
-    <main className="min-h-screen bg-gray-900 text-white font-sans">
+  return(
+    <>
+    {/* ✅ Header only on landing page */}
+    <Header />
+      <main className="min-h-screen bg-gray-900 text-white font-sans mt-16">
       {/* Hero Section */}
       <section id="home" className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
         
@@ -262,12 +296,12 @@ export default function Home() {
         <div className="w-full max-w-7xl mx-auto text-center px-4">
           {/* FlowMint Logo (place /public/flowmint-logo.png) */}
           <div className="flex justify-center mb-8">
-            <img
+            <Image
               src="https://i.postimg.cc/VrRYGJYK/Screenshot-2025-09-07-153801.png"
               alt="FlowMint Logo"
-              referrerPolicy="no-referrer"
-              loading="eager"
-              decoding="async"
+              width={520}
+              height={200}
+              priority
               className="h-24 sm:h-28 lg:h-36 rounded-md object-contain drop-shadow-[0_10px_25px_rgba(168,85,247,0.35)]"
             />
           </div>
@@ -404,12 +438,12 @@ export default function Home() {
 
         {/* PIXEL ART NFT GENERATOR */}
         <PixelArtNFTGenerator 
-          onNFTCreated={(nftData: any) => {
+          onNFTCreated={(nftData: NFTData) => {
             console.log('NFT Created:', nftData);
             setGeneratedNFT(nftData);
             setShowNFTModal(true);
           }}
-          onMintNFT={(nftData: any) => {
+          onMintNFT={(nftData: NFTData) => {
             console.log('Minting NFT with data:', nftData);
             // Set minting status and call handleMint
             setGeneratedNFT({ ...nftData, minting: true });
@@ -497,7 +531,9 @@ export default function Home() {
           )}
           {error && (
             <div className="p-4 bg-red-600/30 border border-red-500 rounded-lg text-center">
-              <p className="text-xs break-all">Error: {(error as any)?.shortMessage || (error as any)?.message || 'Unknown error'}</p>
+              <p className="text-xs break-all">
+                Error: {error instanceof Error ? error.message : String(error)}
+              </p>
             </div>
           )}
         </div>
@@ -518,7 +554,7 @@ export default function Home() {
         nft={generatedNFT}
         isOpen={showNFTModal}
         onClose={() => setShowNFTModal(false)}
-        onMint={(nftData: any) => {
+        onMint={(nftData: NFTData) => {
           setGeneratedNFT({ ...nftData, minting: true });
           handleMint();
         }}
@@ -653,6 +689,6 @@ export default function Home() {
         </div>
       </footer>
     </main>
+    </>
   );
 }
-
